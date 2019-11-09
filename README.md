@@ -16,4 +16,5 @@ When you run the demo it'll ask you for it.
 
 ## Notes
 
-The sample uses the test server URL, change it as you need it.
+- The sample uses the test server URL, change it as you need it.
+- The library is a NET Standard project so you can reference it from NET Core or NET Framework projects
