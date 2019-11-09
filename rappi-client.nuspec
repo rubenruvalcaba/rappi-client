@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>rappi-client</id>
+    <version>1.0.0</version>
+    <authors>Rubén Ruvalcaba C</authors>
+    <owners>Rubén Ruvalcaba C</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Helper for Rappi public api integration</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2019 Sistemas Maestros de Negocios, SA DE CV</copyright>
+    <tags>Rappi,Siman</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+  <files>
+	<file 
+  src=".\rappi-client\bin\Release\netstandard2.0\rappi-client.dll" target="lib\netstandard2.0\appServicesSimanG8.Models.dll" />
+  </files>
+</package>
