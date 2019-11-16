@@ -69,4 +69,20 @@ namespace rappi.Models
         public Client client { get; set; }
         public Store store { get; set; }
     }
+
+    public class OrderError
+    {
+        public int errorCode { get; set; }
+        public string message { get; set; }
+    }
+
+    public class OrderErrorException : System.Exception
+    {
+        public OrderError orderError { get; set; }
+        public OrderErrorException(string message, OrderError error) : base(message)
+        {
+            orderError = error;
+        }
+    }
+
 }

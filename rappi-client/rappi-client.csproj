@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>rappi_client</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.4</Version>
     <Authors>Ruben Ruvalcaba</Authors>
     <Company>Sistemas Maestros de Negocios SA de CV</Company>
     <Description>Rappi public API wrapper</Description>

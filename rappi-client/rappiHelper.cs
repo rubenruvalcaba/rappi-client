@@ -124,7 +124,19 @@ namespace rappi
             client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
             var httpResponse = await client.GetAsync(new Uri(_rappiURL + "/orders/take/" + orderId));
             if (!httpResponse.IsSuccessStatusCode)
-                throw new ApplicationException("Error taking order: " + httpResponse.StatusCode);
+            {
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var jsonString = await httpResponse.Content.ReadAsStringAsync();
+                    var orderError = System.Text.Json.JsonSerializer.Deserialize(
+                                    jsonString, typeof(OrderError)) as OrderError;
+                    throw new OrderErrorException("Error taking the order", orderError);
+                }
+                else
+                {
+                    throw new Exception("Error taking the order " + orderId);
+                }
+            }
 
             return true;
         }
@@ -148,8 +160,10 @@ namespace rappi
             {
                 if (httpResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
-                    var strResponse = await httpResponse.Content.ReadAsStringAsync();
-
+                    var jsonString = await httpResponse.Content.ReadAsStringAsync();
+                    var orderError = System.Text.Json.JsonSerializer.Deserialize(
+                                    jsonString, typeof(OrderError)) as OrderError;
+                    throw new OrderErrorException("Error rejecting the order", orderError);
                 }
                 else
                 {
