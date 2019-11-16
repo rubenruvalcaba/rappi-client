@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>rappi-client</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>Rubén Ruvalcaba C</authors>
     <owners>Rubén Ruvalcaba C</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,6 +16,6 @@
   </metadata>
   <files>
 	<file 
-  src=".\rappi-client\bin\Release\netstandard2.0\rappi-client.dll" target="lib\netstandard2.0\appServicesSimanG8.Models.dll" />
+  src=".\rappi-client\bin\Release\netstandard2.0\rappi-client.dll" target="lib\netstandard2.0\rappi-client.dll" />
   </files>
 </package>

@@ -145,7 +145,17 @@ namespace rappi
             var httpResponse = await client.PostAsync(new Uri(_rappiURL + "/orders/reject"),
                                                       new StringContent(json));
             if (!httpResponse.IsSuccessStatusCode)
-                throw new Exception("Error rejecting the order " + orderId);
+            {
+                if (httpResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var strResponse = await httpResponse.Content.ReadAsStringAsync();
+
+                }
+                else
+                {
+                    throw new Exception("Error rejecting the order " + orderId);
+                }
+            }
 
             return true;
         }
