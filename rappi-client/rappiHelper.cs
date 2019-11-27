@@ -174,6 +174,33 @@ namespace rappi
             return true;
         }
 
+        /// <summary>
+        /// Returns canceled orders
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<CanceledOrder>> CanceledOrders(string cancelationUrl)
+        {
+            List<CanceledOrder> canceledOrders = new List<CanceledOrder>();
+
+            // Get canceled orders
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
+            var url = $"{cancelationUrl}/cancelled-orders?token={_token}";
+            var httpResponse = await client.GetAsync(new Uri(url));
+            if (!httpResponse.IsSuccessStatusCode)
+                throw new ApplicationException("Error getting canceled orders: " + httpResponse.StatusCode);
+
+            string jsonString = await httpResponse.Content.ReadAsStringAsync();
+
+            if (jsonString != "[]")
+            {
+                canceledOrders = System.Text.Json.JsonSerializer.Deserialize(
+                                    jsonString, typeof(List<CanceledOrder>)) as List<CanceledOrder>;
+            }
+
+            return canceledOrders;
+        }
+
         #endregion
 
     }

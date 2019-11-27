@@ -30,6 +30,7 @@ namespace rappi
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("--- Looking for new orders ... Press X to exit ---");
+                Console.WriteLine("--- Press 'C' to check for cancelled orders");
 
                 // Check for new orders each 5 seconds
                 Thread.Sleep(5000);
@@ -38,6 +39,8 @@ namespace rappi
                 if (Console.KeyAvailable)
                     if (Console.ReadKey(true).Key == ConsoleKey.X)
                         break;
+                    else if (Console.ReadKey(true).Key == ConsoleKey.C)
+                        CheckForCanceledOrders(helper);
 
                 // Get the orders
                 try
@@ -51,6 +54,36 @@ namespace rappi
                 }
 
             } while (true);
+
+        }
+
+        private static void CheckForCanceledOrders(rappiHelper helper)
+        {
+            Console.WriteLine("Enter the cancelation url:");
+            var cancelationUrl = Console.ReadLine();
+            try
+            {
+                var canceledOrders = helper.CanceledOrders(cancelationUrl).Result;
+                if (canceledOrders.Count == 0)
+                {
+                    Console.WriteLine("There are no orders cancelled");
+                    return;
+                }
+
+                Console.WriteLine($"{canceledOrders.Count} canceled orders");
+
+                foreach (CanceledOrder canceledOrder in canceledOrders)
+                {
+                    Console.WriteLine($"  Order Id:{canceledOrder.orderId} Store Id:{canceledOrder.storeId}");
+                    Console.WriteLine($"    Reasons: {canceledOrder.cancelReason}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+            }
 
         }
 

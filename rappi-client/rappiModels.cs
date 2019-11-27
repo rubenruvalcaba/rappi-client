@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 namespace rappi.Models
 {
@@ -83,6 +84,14 @@ namespace rappi.Models
         {
             orderError = error;
         }
+    }
+
+    public class CanceledOrder
+    {
+        public string orderId { get; set; }
+        public string storeId { get; set; }
+        public DateTime createdAt { get; set; }
+        public string cancelReason { get; set; }
     }
 
 }
