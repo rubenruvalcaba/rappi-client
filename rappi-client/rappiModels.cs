@@ -90,7 +90,7 @@ namespace rappi.Models
     {
         public string orderId { get; set; }
         public string storeId { get; set; }
-        public DateTime createdAt { get; set; }
+        public string createdAt { get; set; }
         public string cancelReason { get; set; }
         public string partnerStoreId { get; set; }
     }

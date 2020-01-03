@@ -9,6 +9,10 @@ using rappi.Models;
 namespace rappi
 {
 
+    /// <summary>
+    /// Helper class for interact with Rappi public API for querying orders, taking or rejecting orders and querying cancelations
+    /// Author: Ruben Ruvalcaba Camba. SIMAN - Sistemas Maestros de Negocios, SA de CV
+    /// </summary>
     public class rappiHelper
     {
 
