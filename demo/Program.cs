@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using rappi.Models;
+using rappi_client;
+using System.Drawing;
 
 namespace rappi
 {
@@ -16,6 +18,29 @@ namespace rappi
         static void Main(string[] args)
         {
 
+            string option = "";
+            while (option != "X")
+            {
+                Console.WriteLine("1 - Get orders and cancellations");
+                Console.WriteLine("2 - Set store availability");
+                Console.WriteLine("X - Exit");
+                option = Console.ReadLine().ToUpper();
+                switch (option)
+                {
+                    case "1":
+                        Orders();
+                        break;
+                    case "2":
+                        StoreAvailability();
+                        break;
+                }
+            }
+
+        }
+
+        #region Orders 
+        private static void Orders()
+        {
             // Ask for the access token
             Console.WriteLine("Enter your token:");
             var token = Console.ReadLine();
@@ -54,7 +79,6 @@ namespace rappi
                 }
 
             } while (true);
-
         }
 
         private static void CheckForCanceledOrders(rappiHelper helper)
@@ -74,7 +98,7 @@ namespace rappi
 
                 foreach (CanceledOrder canceledOrder in canceledOrders)
                 {
-                    Console.WriteLine($"  Order Id:{canceledOrder.orderId} Store Id:{canceledOrder.storeId}");
+                    Console.WriteLine($"  Order Id:{canceledOrder.orderId} Store Id:{canceledOrder.partnerStoreId}");
                     Console.WriteLine($"    Reasons: {canceledOrder.cancelReason}");
                 }
 
@@ -131,6 +155,55 @@ namespace rappi
 
             }
         }
+
+        #endregion
+
+        #region Store Availability
+        static void StoreAvailability()
+        {
+
+
+            Console.WriteLine("Client Id");
+            var clientId = Console.ReadLine();
+
+            Console.WriteLine("Client Secret");
+            var clientSecret = Console.ReadLine();
+
+            Console.WriteLine("Audience (url)");
+            var audience = Console.ReadLine();
+
+            Console.WriteLine("Availability services login url");
+            var loginUrl = Console.ReadLine();
+
+            Console.WriteLine("Store id:");
+            var storeId = Console.ReadLine();
+
+            string setStoreOnOff = "";
+            while(setStoreOnOff.ToUpper() != "ON" && setStoreOnOff.ToUpper() != "OFF")
+            {
+                Console.WriteLine("Set store On/Off");
+                setStoreOnOff = Console.ReadLine();
+            }
+
+            try
+            {
+                var helper = new availabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
+                availabilityServicesHelper.StoreAvailabilityRequest request = new availabilityServicesHelper.StoreAvailabilityRequest();
+                if (setStoreOnOff == "ON")
+                    request.turn_on.Add(storeId);
+                else
+                    request.turn_off.Add(storeId);
+
+                helper.StoreAvailability(request);
+
+            }catch(Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+        #endregion
 
     }
 }
