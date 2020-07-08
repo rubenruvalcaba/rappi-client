@@ -51,7 +51,7 @@ namespace rappi_client
                 _bearerExpires = DateTime.Now.AddMinutes(30); // Token expiration 30 minutes
             }
 
-            return "Bearer "+ _bearerToken;
+            return "Bearer " + _bearerToken;
         }
 
         private async Task<string> Login()
@@ -106,11 +106,11 @@ namespace rappi_client
         /// <summary>
         /// Turns on and/or off stores
         /// </summary>
-        public async void StoreAvailability(StoreAvailabilityRequest storeAvailabilityRequest)
+        public async void StoreAvailability(StoreAvailabilityRequest request)
         {
 
             // Builds the request
-            string body = JsonSerializer.Serialize(storeAvailabilityRequest);
+            string body = JsonSerializer.Serialize(request);
 
             // Post the request
             var client = new HttpClient();
@@ -118,6 +118,42 @@ namespace rappi_client
             var httpResponse = await client.PutAsync(new Uri(_audience + "/availability/stores"), new StringContent(body, Encoding.UTF8, "application/json"));
             if (!httpResponse.IsSuccessStatusCode)
                 throw new ApplicationException("Error setting Stores Availability: " + httpResponse.StatusCode);
+
+        }
+
+        #endregion
+
+        #region Items Availability
+
+        public class ItemAvailabilityRequest
+        {
+            public string store_integration_id { get; set; }
+            public ItemsOnOff items { get; set; } = new ItemsOnOff();
+
+            public class ItemsOnOff
+            {
+                /// <summary>
+                /// Array with the stores id to be turned on</param>
+                /// </summary>
+                public List<string> turn_on { get; set; } = new List<string>();
+                /// <summary>
+                /// Array with the stores id to be turned off
+                /// </summary>
+                public List<string> turn_off { get; set; } = new List<string>();
+            }
+
+        }
+        public async void ItemsAvailability(List<ItemAvailabilityRequest> request)
+        {
+            // Builds the request
+            string body = JsonSerializer.Serialize(request);
+
+            // Post the request
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("x-authorization", GetBearerToken());
+            var httpResponse = await client.PutAsync(new Uri(_audience + "/availability/stores/items"), new StringContent(body, Encoding.UTF8, "application/json"));
+            if (!httpResponse.IsSuccessStatusCode)
+                throw new ApplicationException("Error setting Items availability: " + httpResponse.StatusCode);
 
         }
 

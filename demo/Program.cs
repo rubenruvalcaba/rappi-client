@@ -23,6 +23,7 @@ namespace rappi
             {
                 Console.WriteLine("1 - Get orders and cancellations");
                 Console.WriteLine("2 - Set store availability");
+                Console.WriteLine("3 - Items availability");
                 Console.WriteLine("X - Exit");
                 option = Console.ReadLine().ToUpper();
                 switch (option)
@@ -32,6 +33,9 @@ namespace rappi
                         break;
                     case "2":
                         StoreAvailability();
+                        break;
+                    case "3":
+                        ItemsAvailability();
                         break;
                 }
             }
@@ -158,32 +162,48 @@ namespace rappi
 
         #endregion
 
-        #region Store Availability
+        #region Store and Items Availability
+
+        static string clientId;
+        static string clientSecret;
+        static string audience;
+        static string loginUrl;
+        static string storeId;
+
+        static void AskAvailabilityParameters()
+        {
+            Console.WriteLine("Client Id");
+            clientId = Console.ReadLine();
+            Console.WriteLine("Client Secret");
+            clientSecret = Console.ReadLine();
+            Console.WriteLine("Audience (url)");
+            audience = Console.ReadLine();
+            Console.WriteLine("Availability services login url");
+            loginUrl = Console.ReadLine();
+            Console.WriteLine("Store id:");
+            storeId = Console.ReadLine();
+
+        }
+
+        static string AskOnOff()
+        {
+            string setOnOff = "";
+            while (setOnOff.ToUpper() != "ON" && setOnOff.ToUpper() != "OFF")
+            {
+                Console.WriteLine("Set On/Off");
+                setOnOff = Console.ReadLine();
+            }
+
+            return setOnOff;
+        }
+
         static void StoreAvailability()
         {
 
+            AskAvailabilityParameters();
 
-            Console.WriteLine("Client Id");
-            var clientId = Console.ReadLine();
 
-            Console.WriteLine("Client Secret");
-            var clientSecret = Console.ReadLine();
-
-            Console.WriteLine("Audience (url)");
-            var audience = Console.ReadLine();
-
-            Console.WriteLine("Availability services login url");
-            var loginUrl = Console.ReadLine();
-
-            Console.WriteLine("Store id:");
-            var storeId = Console.ReadLine();
-
-            string setStoreOnOff = "";
-            while(setStoreOnOff.ToUpper() != "ON" && setStoreOnOff.ToUpper() != "OFF")
-            {
-                Console.WriteLine("Set store On/Off");
-                setStoreOnOff = Console.ReadLine();
-            }
+            string setStoreOnOff = AskOnOff();
 
             try
             {
@@ -196,14 +216,47 @@ namespace rappi
 
                 helper.StoreAvailability(request);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.ToString());
             }
 
         }
-        #endregion
 
+        static void ItemsAvailability()
+        {
+            AskAvailabilityParameters();
+
+            Console.WriteLine("Item id:");
+            var itemId = Console.ReadLine();
+
+            string setItemOnOff = AskOnOff();
+
+            try
+            {
+                var helper = new availabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
+                List<availabilityServicesHelper.ItemAvailabilityRequest> request = new List<availabilityServicesHelper.ItemAvailabilityRequest>();
+                var item = new availabilityServicesHelper.ItemAvailabilityRequest() { store_integration_id = storeId };
+
+                if (setItemOnOff == "ON")
+                    item.items.turn_on.Add(itemId);
+                else
+                    item.items.turn_off.Add(itemId);
+
+                request.Add(item);
+
+                helper.ItemsAvailability(request);
+
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        #endregion
     }
 }
