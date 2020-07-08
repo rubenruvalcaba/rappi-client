@@ -47,14 +47,14 @@ namespace rappi_client
             // If doesn't have a bearer yet or it's expired, gets one
             if (string.IsNullOrEmpty(_bearerToken) || _bearerExpires <= DateTime.Now)
             {
-                _bearerToken = Login().Result;
+                _bearerToken = Login();
                 _bearerExpires = DateTime.Now.AddMinutes(30); // Token expiration 30 minutes
             }
 
             return "Bearer " + _bearerToken;
         }
 
-        private async Task<string> Login()
+        private string Login()
         {
 
             // Builds the request
@@ -68,12 +68,12 @@ namespace rappi_client
 
             // Do the login
             var client = new HttpClient();
-            var httpResponse = await client.PostAsync(new Uri(_availabilityServicesLoginUrl),
-                                                      new StringContent(body, Encoding.UTF8, "application/json"));
+            var httpResponse =  client .PostAsync(new Uri(_availabilityServicesLoginUrl),
+                                                      new StringContent(body, Encoding.UTF8, "application/json")).Result;
             if (!httpResponse.IsSuccessStatusCode)
                 throw new ApplicationException("Error Logging into Availability Services: " + httpResponse.StatusCode);
 
-            string jsonString = await httpResponse.Content.ReadAsStringAsync();
+            string jsonString = httpResponse.Content.ReadAsStringAsync().Result;
 
             // Gets the token from the response
             if (jsonString != "[]")
