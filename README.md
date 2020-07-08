@@ -8,6 +8,8 @@ Helper class to interact with the Rappi Public API
 - Get orders
 - Take order
 - Reject order
+- Store availability
+- Item availability
 
 ## Requirements
 
