@@ -247,7 +247,7 @@ namespace rappi
 
                 request.Add(item);
 
-                helper.ItemsAvailability(request);
+                helper.ItemsAvailability(request).GetAwaiter().GetResult();
 
             }
             catch (Exception ex)

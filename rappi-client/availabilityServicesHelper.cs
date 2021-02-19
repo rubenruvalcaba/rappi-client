@@ -22,6 +22,17 @@ namespace rappi_client
 
         #endregion
 
+        #region Events
+
+        public class LoggedInEventArgs : EventArgs
+        {
+            public DateTime Expires { get; set; }
+        }
+
+        public event EventHandler<LoggedInEventArgs> LoggedIn;
+
+        #endregion
+
         #region Initialization
 
         public availabilityServicesHelper(string clientId,
@@ -47,14 +58,13 @@ namespace rappi_client
             // If doesn't have a bearer yet or it's expired, gets one
             if (string.IsNullOrEmpty(_bearerToken) || _bearerExpires <= DateTime.Now)
             {
-                _bearerToken = Login();
-                _bearerExpires = DateTime.Now.AddMinutes(30); // Token expiration 30 minutes
+                 Login();                
             }
 
             return "Bearer " + _bearerToken;
         }
 
-        private string Login()
+        private void Login()
         {
 
             // Builds the request
@@ -80,7 +90,14 @@ namespace rappi_client
             {
                 var response = System.Text.Json.JsonSerializer.Deserialize(
                                     jsonString, typeof(AvailabilityServicesLoginResponse)) as AvailabilityServicesLoginResponse;
-                return response.access_token;
+                
+                _bearerToken= response.access_token;
+                _bearerExpires = DateTime.Now.AddSeconds(response.expires_in);
+
+                EventHandler<LoggedInEventArgs> handler = LoggedIn;
+                if (handler != null)
+                    handler(this, new LoggedInEventArgs() { Expires = _bearerExpires });
+
             }
             else
                 throw new ApplicationException("No access token received");
@@ -143,7 +160,10 @@ namespace rappi_client
             }
 
         }
-        public async void ItemsAvailability(List<ItemAvailabilityRequest> request)
+
+
+
+        public async Task ItemsAvailability(List<ItemAvailabilityRequest> request)
         {
             // Builds the request
             string body = JsonSerializer.Serialize(request);

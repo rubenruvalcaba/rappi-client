@@ -43,12 +43,12 @@ namespace rappi
         private DateTime _bearerExpires;
 
         // Requests and returns the bearer token for API interaction
-        private string GetBearerToken()
+        private async Task<string> GetBearerToken()
         {
             // If doesn't have a bearer yet or it's expired, gets one
             if (string.IsNullOrEmpty(_bearerToken) || _bearerExpires <= DateTime.Now)
             {
-                _bearerToken = Login().Result;
+                _bearerToken = await Login();
                 _bearerExpires = DateTime.Now.AddMinutes(30); // Token expiration 30 minutes
             }
 
@@ -100,7 +100,7 @@ namespace rappi
 
             // Get pending orders
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
+            client.DefaultRequestHeaders.Add("X-Auth-Int", await GetBearerToken());
             var httpResponse = await client.GetAsync(new Uri(_rappiURL + "/orders"));
             if (!httpResponse.IsSuccessStatusCode)
                 throw new ApplicationException("Error getting orders: " + httpResponse.StatusCode);
@@ -125,7 +125,7 @@ namespace rappi
         public async Task<bool> TakeOrder(string orderId)
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
+            client.DefaultRequestHeaders.Add("X-Auth-Int", await GetBearerToken());
             var httpResponse = await client.GetAsync(new Uri(_rappiURL + "/orders/take/" + orderId));
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -134,7 +134,7 @@ namespace rappi
                     var jsonString = await httpResponse.Content.ReadAsStringAsync();
                     var orderError = System.Text.Json.JsonSerializer.Deserialize(
                                     jsonString, typeof(OrderError)) as OrderError;
-                    throw new OrderErrorException("Error taking the order", orderError);
+                    throw new OrderErrorException("Error taking the order " + orderError.message, orderError);
                 }
                 else
                 {
@@ -157,7 +157,7 @@ namespace rappi
 
             // Invoca al endpoint /reject
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
+            client.DefaultRequestHeaders.Add("X-Auth-Int", await GetBearerToken());
             var httpResponse = await client.PostAsync(new Uri(_rappiURL + "/orders/reject"),
                                                       new StringContent(json));
             if (!httpResponse.IsSuccessStatusCode)
@@ -188,7 +188,7 @@ namespace rappi
 
             // Get canceled orders
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("X-Auth-Int", GetBearerToken());
+            client.DefaultRequestHeaders.Add("X-Auth-Int", await GetBearerToken());
             var url = $"{cancelationUrl}/cancelled-orders?token={_token}";
             var httpResponse = await client.GetAsync(new Uri(url));
             if (!httpResponse.IsSuccessStatusCode)
