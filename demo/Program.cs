@@ -204,11 +204,11 @@ namespace rappi
 
 
             string setStoreOnOff = AskOnOff();
-
+/*
             try
             {
-                var helper = new availabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
-                availabilityServicesHelper.StoreAvailabilityRequest request = new availabilityServicesHelper.StoreAvailabilityRequest();
+                var helper = new AvailabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
+                AvailabilityServicesHelper.StoreAvailabilityRequest request = new AvailabilityServicesHelper.StoreAvailabilityRequest();
                 if (setStoreOnOff == "ON")
                     request.turn_on.Add(storeId);
                 else
@@ -222,7 +222,7 @@ namespace rappi
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.ToString());
             }
-
+*/
         }
 
         static void ItemsAvailability()
@@ -233,12 +233,12 @@ namespace rappi
             var itemId = Console.ReadLine();
 
             string setItemOnOff = AskOnOff();
-
+/*
             try
             {
-                var helper = new availabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
-                List<availabilityServicesHelper.ItemAvailabilityRequest> request = new List<availabilityServicesHelper.ItemAvailabilityRequest>();
-                var item = new availabilityServicesHelper.ItemAvailabilityRequest() { store_integration_id = storeId };
+                var helper = new AvailabilityServicesHelper(clientId, clientSecret, audience, loginUrl);
+                List<AvailabilityServicesHelper.ItemAvailabilityRequest> request = new List<AvailabilityServicesHelper.ItemAvailabilityRequest>();
+                var item = new AvailabilityServicesHelper.ItemAvailabilityRequest() { store_integration_id = storeId };
 
                 if (setItemOnOff == "ON")
                     item.items.turn_on.Add(itemId);
@@ -254,7 +254,7 @@ namespace rappi
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.ToString());
-            }
+            }*/
         }
 
         #endregion

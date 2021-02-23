@@ -5,10 +5,11 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace rappi_client
 {
-    public class availabilityServicesHelper
+    public class AvailabilityServicesHelper
     {
 
         #region Fields 
@@ -19,6 +20,7 @@ namespace rappi_client
         private string _clientSecret;
         private string _audience;
         private DateTime _bearerExpires;
+        readonly ILogger<AvailabilityServicesHelper> _logger;
 
         #endregion
 
@@ -35,16 +37,23 @@ namespace rappi_client
 
         #region Initialization
 
-        public availabilityServicesHelper(string clientId,
+        public AvailabilityServicesHelper(string clientId,
                                           string clientSecret,
                                           string audience,
-                                          string availabilityServicesLoginUrl)
+                                          string availabilityServicesLoginUrl,
+                                          ILogger<AvailabilityServicesHelper> logger)
         {
-
+            _logger = logger;
             _clientId = clientId;
             _clientSecret = clientSecret;
             _audience = audience;
             _availabilityServicesLoginUrl = availabilityServicesLoginUrl;
+
+            _logger.LogDebug("Initializing AvailabilityServicesHelper");
+            _logger.LogDebug($"Client Id: {clientId}");
+            _logger.LogDebug($"Client Secret: {clientSecret}");
+            _logger.LogDebug($"Audience: {audience}");
+            _logger.LogDebug($"LoginUrl: {availabilityServicesLoginUrl}");
 
         }
 
@@ -58,7 +67,7 @@ namespace rappi_client
             // If doesn't have a bearer yet or it's expired, gets one
             if (string.IsNullOrEmpty(_bearerToken) || _bearerExpires <= DateTime.Now)
             {
-                 Login();                
+                Login();
             }
 
             return "Bearer " + _bearerToken;
@@ -66,6 +75,8 @@ namespace rappi_client
 
         private void Login()
         {
+
+            _logger.LogDebug("Logging in ...");
 
             // Builds the request
             string body = JsonSerializer.Serialize(new
@@ -78,20 +89,27 @@ namespace rappi_client
 
             // Do the login
             var client = new HttpClient();
-            var httpResponse =  client .PostAsync(new Uri(_availabilityServicesLoginUrl),
+            var httpResponse = client.PostAsync(new Uri(_availabilityServicesLoginUrl),
                                                       new StringContent(body, Encoding.UTF8, "application/json")).Result;
             if (!httpResponse.IsSuccessStatusCode)
-                throw new ApplicationException("Error Logging into Availability Services: " + httpResponse.StatusCode);
+            {
+                var message = $"Error Logging into Availability Services. StatusCode: {httpResponse.StatusCode} ";
+                _logger.LogError(message);
+                _logger.LogDebug("Login request: " + body);
+                throw new ApplicationException(message);
+            }
 
             string jsonString = httpResponse.Content.ReadAsStringAsync().Result;
+
+            _logger.LogDebug("Login Response: " + jsonString);
 
             // Gets the token from the response
             if (jsonString != "[]")
             {
                 var response = System.Text.Json.JsonSerializer.Deserialize(
                                     jsonString, typeof(AvailabilityServicesLoginResponse)) as AvailabilityServicesLoginResponse;
-                
-                _bearerToken= response.access_token;
+
+                _bearerToken = response.access_token;
                 _bearerExpires = DateTime.Now.AddSeconds(response.expires_in);
 
                 EventHandler<LoggedInEventArgs> handler = LoggedIn;
@@ -161,19 +179,25 @@ namespace rappi_client
 
         }
 
-
-
         public async Task ItemsAvailability(List<ItemAvailabilityRequest> request)
         {
             // Builds the request
             string body = JsonSerializer.Serialize(request);
+
+            _logger.LogDebug("ItemsAvailability request body:" + body);
 
             // Post the request
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("x-authorization", GetBearerToken());
             var httpResponse = await client.PutAsync(new Uri(_audience + "/availability/stores/items"), new StringContent(body, Encoding.UTF8, "application/json"));
             if (!httpResponse.IsSuccessStatusCode)
-                throw new ApplicationException("Error setting Items availability: " + httpResponse.StatusCode);
+            {
+                var message = $"Error setting Items availability: {httpResponse.StatusCode}";
+                _logger.LogError(message);                
+                throw new ApplicationException();
+            }
+
+            _logger.LogDebug($"ItemsAvailability response Success StatusCode: {httpResponse.StatusCode}" );
 
         }
 
