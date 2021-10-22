@@ -193,9 +193,11 @@ namespace rappi_client
             if (!httpResponse.IsSuccessStatusCode)
             {
                 var message = $"Error setting Items availability: {httpResponse.StatusCode}";
-                _logger.LogError(message);                
+                _logger.LogError(message);
+                _logger.LogError($"Body:{body}");
                 throw new ApplicationException();
             }
+
 
             _logger.LogDebug($"ItemsAvailability response Success StatusCode: {httpResponse.StatusCode}" );
 
