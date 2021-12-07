@@ -24,17 +24,7 @@ namespace rappi_client
 
         #endregion
 
-        #region Events
-
-        public class LoggedInEventArgs : EventArgs
-        {
-            public DateTime Expires { get; set; }
-        }
-
-        public event EventHandler<LoggedInEventArgs> LoggedIn;
-
-        #endregion
-
+      
         #region Events
 
         public class LoggedInEventArgs : EventArgs
